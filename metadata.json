@@ -1,0 +1,7 @@
+{
+  "name": "Kal Ai: Calorie Scanner",
+  "description": "An AI-powered application to estimate the calorie and nutritional content of food from a photo. It also includes a tool to calculate your recommended daily calorie intake.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
