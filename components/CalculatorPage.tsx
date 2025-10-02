@@ -92,6 +92,7 @@ const CalculatorPage: React.FC = () => {
       goalLabel: goalLabel,
     });
     setMotivationalMessage(getMotivationalMessage(dietGoal));
+    localStorage.setItem('dietGoal', dietGoal);
     setNativeAdKey(`calc-${new Date().getTime()}`);
   };
 

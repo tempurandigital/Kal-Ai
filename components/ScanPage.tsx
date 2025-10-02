@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { analyzeFoodImage, generateHealthSummary, generatePortionSuggestion } from '../services/geminiService';
 import { FoodAnalysisResult } from '../types';
@@ -82,7 +83,8 @@ const ScanPage: React.FC = () => {
           setIsSummaryLoading(false);
         });
         
-        generatePortionSuggestion(result).then(portion => {
+        const userDietGoal = localStorage.getItem('dietGoal');
+        generatePortionSuggestion(result, userDietGoal).then(portion => {
           setPortionSuggestion(portion);
           setIsPortionLoading(false);
         });

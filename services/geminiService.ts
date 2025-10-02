@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { FoodAnalysisResult, RecipeResult } from '../types';
 
@@ -138,10 +139,25 @@ export const generateHealthSummary = async (analysis: FoodAnalysisResult): Promi
     }
 };
 
-export const generatePortionSuggestion = async (analysis: FoodAnalysisResult): Promise<string> => {
+const goalMappings: { [key: string]: string } = {
+    gain: 'peningkatan berat badan',
+    slow_gain: 'peningkatan berat badan secara perlahan',
+    maintain: 'mempertahankan berat badan',
+    slow_loss: 'pengurangan berat badan secara perlahan',
+    loss: 'pengurangan berat badan'
+};
+
+export const generatePortionSuggestion = async (analysis: FoodAnalysisResult, dietGoal?: string | null): Promise<string> => {
     try {
         const { dishName, nutrition, description } = analysis;
-        const prompt = `Berdasarkan analisis nutrisi hidangan "${dishName}" (Kalori: ${nutrition.calories.toFixed(0)} kcal) yang dideskripsikan sebagai "${description}", berikan saran ukuran porsi yang direkomendasikan dalam Bahasa Indonesia. Pertimbangkan apakah ini makanan padat kalori atau ringan. Berikan saran yang praktis dan mudah dipahami dalam satu kalimat. Contoh: "Karena kalorinya cukup tinggi, porsi sebesar satu mangkuk kecil sudah cukup." atau "Makanan ini cocok sebagai camilan ringan, nikmati sekitar satu genggam."`;
+        let prompt = `Berdasarkan analisis nutrisi hidangan "${dishName}" (Kalori: ${nutrition.calories.toFixed(0)} kcal) yang dideskripsikan sebagai "${description}", berikan saran ukuran porsi yang direkomendasikan dalam Bahasa Indonesia. Pertimbangkan apakah ini makanan padat kalori atau ringan. Berikan saran yang praktis dan mudah dipahami dalam satu kalimat.`;
+
+        if (dietGoal && goalMappings[dietGoal]) {
+            const goalDescription = goalMappings[dietGoal];
+            prompt += ` \n\nPENTING: Pengguna memiliki tujuan diet untuk "${goalDescription}". Sesuaikan saran porsi Anda dengan tujuan ini. Jika tujuannya adalah pengurangan berat badan, sarankan porsi yang lebih kecil atau opsi rendah kalori. Jika tujuannya adalah peningkatan berat badan, sarankan porsi yang lebih besar atau padat kalori.`;
+        } else {
+            prompt += ` Contoh: "Karena kalorinya cukup tinggi, porsi sebesar satu mangkuk kecil sudah cukup." atau "Makanan ini cocok sebagai camilan ringan, nikmati sekitar satu genggam."`;
+        }
 
         const response = await ai.models.generateContent({
             model: MODEL_NAME,
